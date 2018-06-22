@@ -1,0 +1,192 @@
+<!-- Copyright © 2018 Ali Deym <self@alideym.net> (http://alideym.net) -->
+<html>
+    <meta charset="utf-8">
+    <head>
+       <title>Lua SDL2 Emscripten C99 WebAssembly - By Ali Deym</title>
+
+       <script src="res/jquery-3.3.1.min.js"></script>
+
+       <script src="codemirror/codemirror.js"></script>
+       <link rel="stylesheet" href="codemirror/codemirror.css">
+       <script src="codemirror/lua.js"></script>
+       <link rel="stylesheet" href="codemirror/ambiance.css">
+    </head>
+    <body>
+        <canvas id="canvas" width="100%" height="30%" oncontextmenu="event.preventDefault()"></canvas>
+
+        <script type="text/javascript">
+        var myCodeMirror = CodeMirror(document.body, {
+            value: `
+
+local rand_index = 0
+local rand_x = 0
+local rand_y = 0
+
+local i = 0
+local going_up = false
+local going_right = true
+local going_down = false
+local going_left = false
+
+local offset_x = 0
+local offset_y = 0
+
+function SDL2_Loop()
+
+\tSDL_SetRenderDrawColor(30, 50, 50, 255)
+\tSDL_RenderClear()
+\tSDL_SetRenderDrawColor(14, 225, 155, 255)
+
+\tif going_right then
+\t\ti = i + 1
+\t\toffset_x = i
+\t\t
+\t\tSDL_RenderFillRect(300 + i, 250 + offset_y, 75, 75)
+\t\t
+\t\tif i > 120 then
+\t\t\tgoing_right = false
+\t\t\tgoing_up = true
+\t\t\ti = 0
+\t\tend
+\tend
+
+\tif going_up then
+\t\ti = i + 1
+\t\toffset_y = i * -1
+\t\t
+\t\tSDL_RenderFillRect(300 + offset_x, 250 - i, 75, 75)
+\t\t
+\t\tif i > 120 then
+\t\t\tgoing_up = false
+\t\t\tgoing_left = true
+\t\t\ti = 0
+\t\tend
+\tend
+
+\tif going_left then
+\t\ti = i + 1
+\t\toffset_x = offset_x - 1
+\t
+\t\tSDL_RenderFillRect(300 + offset_x, 250 + offset_y, 75, 75)
+\t
+\t\tif i > 120 then
+\t\t\tgoing_left = false
+\t\t\tgoing_down = true
+\t\t\ti = 0
+\t\tend
+\tend
+
+\tif going_down then
+\t\ti = i + 1
+\t\toffset_y = offset_y + 1
+\t
+\t\tSDL_RenderFillRect(300 + offset_x, 250 + offset_y, 75, 75)
+\t
+\t\tif i > 120 then
+\t\t\tgoing_down = false
+\t\t\tgoing_right = true
+\t\t\ti = 0
+\t\tend
+\tend
+
+\trand_index = rand_index + 1
+
+\tif rand_index > 20 then
+\t\trand_index = 0
+\t\trand_x = Random(1, 800)
+\t\trand_y = Random(1, 600)
+\tend
+
+\tSDL_RenderFillRect(rand_x, rand_y, 5, 5)
+
+end
+
+function SDL2_Main()
+\tSDL_Init()
+\tSDL_CreateWindowAndRenderer()
+\t
+\tSDL_Loop("SDL2_Loop")
+\t
+\tSDL_Quit()
+\t
+end
+
+
+
+SDL2_Main()`,
+            mode:  "lua",
+            lineNumbers: true,
+            theme: "ambiance",
+            indentWithTabs: true,
+            tabSize: 2
+            /*extraKeys: {
+  Tab: (cm) => cm.execCommand("indentMore").execCommand("indentMore"),
+  "Shift-Tab": (cm) => cm.execCommand("indentLess"),
+}*/
+        });
+
+        myCodeMirror.on("keyup", function (cm, event) {
+            text_changed ();
+        });
+        </script>
+        <!--<pre><code id="edit" class="lua" style="width: 800px; height: 480px;" onkeyup="text_changed();">
+
+        </code></pre>-->
+        <div id="result" style="width: 800px; float: right"></div>
+        </div>
+
+        <script type='text/javascript'>
+            var Module = {
+                canvas: (function() {
+                    var canvas = document.getElementById('canvas');
+                    return canvas;
+                    })(),
+                postRun: [
+                    text_changed
+                ],
+                print: (function() {
+                    return function(text) {
+                        if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+                        console.log(text);
+    
+                        if(text != "emsc") {
+                            document.getElementById("result").innerHTML += "<br>\n" + text;
+                        }
+                    };
+                    })(),
+                    printErr: function(text) {
+                    if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+                        if (0) { 
+                            dump(text + '\n');
+                        } else {
+                            console.error(text);
+                        }
+                    }
+                };
+    
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', 'main.wasm', true);
+                xhr.responseType = 'arraybuffer';
+                xhr.overrideMimeType("application/javascript");
+                xhr.onload = function() {
+                    Module.wasmBinary = xhr.response;
+    
+                    var script = document.createElement('script');
+                    script.src = "main.js";
+                    document.body.appendChild(script);
+                };
+                xhr.send(null);
+    
+                var timer;
+                function text_changed() {
+                    clearTimeout(timer);
+                    input = myCodeMirror.getValue();
+                    timer = setTimeout(function() {
+                            document.getElementById("result").innerHTML = "";
+                            Module.ccall("run_lua", 'number', ['string'], [input]);
+                        },
+                        750);
+                }
+           </script>
+    </body>
+</html>
