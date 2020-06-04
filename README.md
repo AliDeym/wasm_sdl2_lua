@@ -1,7 +1,7 @@
 # wasm_sdl2_lua
 WebAssembly (Emscripten) lua language with SDL2 implemented functions.
 
-`Live preview:` [demo](http://alideym.net/main)
+`Live preview:` [demo](https://deym.dev/wasmlua/main.html)
 
 **Note:** This project is currently for testing purpose and to show you how SDL2 can simply be used with lua on web.
 
