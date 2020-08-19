@@ -1,7 +1,7 @@
 # wasm_sdl2_lua
 WebAssembly (Emscripten) lua language with SDL2 implemented functions.
 
-`Live preview:` [demo](https://deym.dev/wasmlua/main.html)
+### [Live Demo](https://alideym.github.io/wasm_sdl2_lua/main.html)
 
 **Note:** This project is currently for testing purpose and to show you how SDL2 can simply be used with lua on web.
 
@@ -9,7 +9,7 @@ WebAssembly (Emscripten) lua language with SDL2 implemented functions.
 
 This project is licensed under [MIT License](https://github.com/AliDeym/wasm_sdl2_lua/blob/master/LICENSE)
 
-This is a heavy modified version of [wasm_lua](https://github.com/bwrsandman/wasm_lua) by [Sandy Carter](https://github.com/bwrsandman).
+This is a modified version of [wasm_lua](https://github.com/bwrsandman/wasm_lua) by [Sandy Carter](https://github.com/bwrsandman).
 
 SDL graphics and ideas are inspired of [sdl-canvas-wasm](https://github.com/timhutton/sdl-canvas-wasm) by [Tim Hutton](https://github.com/timhutton).
 
